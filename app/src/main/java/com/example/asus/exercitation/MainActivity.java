@@ -4,10 +4,13 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import java.lang.reflect.Array;
+import com.alibaba.fastjson.JSON;
+import com.example.asus.exercitation.Adapter.ShopingAdapter;
+import com.example.asus.exercitation.Http_Request.Request;
+import com.example.asus.exercitation.class_Product.Product;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,33 +21,20 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        //数据 、适配器、xml布局
-        List<String> list = Arrays.asList("a","b","c");
-        ArrayAdapter<String> adapter =new ArrayAdapter<String>(MainActivity.this,R.layout.shopping_show,list);
+        Request http_Thread = new Request();
+        http_Thread.start();
+        try {
+            http_Thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        List<Product> list =
+                JSON.parseArray(http_Thread.getResult(),Product.class);
+        ShopingAdapter adapter = new ShopingAdapter(
+                this, R.layout.shopping_show, list
+        );
         ListView listView = (ListView)findViewById(R.id.list_show);
         listView.setAdapter(adapter);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 }
